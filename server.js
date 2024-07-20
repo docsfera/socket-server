@@ -1,20 +1,27 @@
-const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
+var express = require('express'),
+    http = require('http');
+var app = express();
+var server = http.createServer(app);
+const port = 8077
+const io = require('socket.io')(server);
 
-// app.get('/', (req, res) => {
-//     res.sendFile(__dirname + '/index.html');
-// });
 
-io.on('connection', (socket) => {
-    socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
-    });
-});
-
-server.listen(3000, () => {
-    console.log('listening on *:3000');
-});
+app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/index.html')
+})
+io.on('connection', (socket) => { 
+  console.log('Client connected') 
+  socket.on('disconnect', () => { 
+    console.log('Client disconnected') 
+  }) 
+  socket.on('message', (msg) => { 
+    console.log({msg})
+    io.emit('message', msg) 
+  }) 
+}) 
+// app.listen(port, () => {
+//     console.log(`App listening on port ${port}`)
+// })
+server.listen(port, () => { 
+  console.log(`App listening on port ${port}`)
+})
