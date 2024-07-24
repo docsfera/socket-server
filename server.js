@@ -1,14 +1,13 @@
-var express = require('express'),
-    http = require('http');
+var express = require('express'); // Express contains some boilerplate to for routing and such
 var app = express();
-var server = http.createServer(app);
-const port = 8077
-const io = require('socket.io')(server);
+var http = require('http').Server(app);
+var io = require('socket.io')(http); // вставьте это после определения http
 
+// Serve the index page 
+app.get("/", function (request, response) {
+  response.sendFile(__dirname + '/index.html');
+});
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html')
-})
 io.on('connection', (socket) => { 
   console.log('Client connected') 
   socket.on('disconnect', () => { 
@@ -19,9 +18,10 @@ io.on('connection', (socket) => {
     io.emit('message', msg) 
   }) 
 }) 
-// app.listen(port, () => {
-//     console.log(`App listening on port ${port}`)
-// })
-server.listen(port, () => { 
-  console.log(`App listening on port ${port}`)
-})
+
+// Listen on port 5000
+app.set('port', (process.env.PORT || 5000));
+http.listen(app.get('port'), function(){
+  console.log('listening on port',app.get('port'));
+});
+
