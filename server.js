@@ -8,6 +8,8 @@ app.get("/", function (request, response) {
   response.sendFile(__dirname + '/index.html');
 });
 
+app.use('/static', express.static('static'));
+
 io.on('connection', (socket) => { 
   console.log('Client connected') 
   socket.on('disconnect', () => { 
