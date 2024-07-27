@@ -2,7 +2,7 @@
 <html>
   <head>
     <style type="text/css">
-      body{
+      body, ul{
         padding: 0;
         margin: 0;
       }
@@ -11,10 +11,18 @@
         bottom: 50px;
         right: 40px;
       }
+      button{
+        position: absolute;
+        bottom: 50px;
+        left: 50%;
+        width: 100px;
+        height: 30px;
+      }
     </style>
   </head>
   <body>
     <ul id="messages"></ul>
+    <button>HIT</button>
     <form id="form" action=""><input id="input" autocomplete="off" /><button>Send</button></form>
     <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script type="module" src="static/main.js"></script>

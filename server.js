@@ -3,6 +3,12 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http); // вставьте это после определения http
 
+
+const stack = {
+  nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+}
+
 // Serve the index page 
 app.get("/", function (request, response) {
   response.sendFile(__dirname + '/index.html');
@@ -22,10 +28,15 @@ io.on('connection', (socket) => {
     playersCount--
     console.log('Client disconnected') 
   }) 
-  socket.on('message', (msg) => { 
-    console.log({msg})
-    io.emit('message', msg) 
+  socket.on('message', data => { 
+    console.log(data.msg)
+    io.emit('message', data) 
   }) 
+
+
+  socket.on("hit", (playersCount) => {
+    io.emit('hit', {playersCount, value: stack.nums[3]}) 
+  })
 }) 
 
 // Listen on port 5000

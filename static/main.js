@@ -5,7 +5,47 @@ import { OrbitControls } from './OrbitControls.js'
 
 let test
 
+let yourCardsCount = 0
+let apponentCardsCount = 0
+
 let INIT = false
+
+
+var socket = io()
+var form = document.getElementById('form')
+var input = document.getElementById('input')
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault()
+  if (input.value) {
+    socket.emit('message', {msg: input.value, player: test})
+    input.value = ''
+  }
+})
+socket.on('message', function (data) {
+
+  document.querySelectorAll("li").forEach(el => el.style.bottom = +el.style.bottom.replace("px", "") + 15 + "px")
+
+  var item = document.createElement('li')
+  item.style.position = "absolute"
+  item.style.right = "40px"
+  item.style.bottom = "70px"
+  item.textContent = data.msg //test + ": " + msg
+  item.style.color = (data.player == 1) ? "blue" : "green"
+  messages.appendChild(item)
+  window.scrollTo(0, document.body.scrollHeight)
+
+  //addCube()
+})
+
+socket.on('new player', function(playersCount){
+  console.log("ff")
+  if(!INIT) init(playersCount)
+  INIT = true
+  
+})
+
+/////// SCENE ////////
 
 const init = playersCount => {
   test = playersCount
@@ -32,17 +72,52 @@ const init = playersCount => {
   }
 
 
-  function addCube(){
-    const cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
-    cube.position.set(-5.5, 4.5, 2)
+  function addCube(data){
+    console.log(data)
+    if(data.playersCount !== playersCount){
 
+      if(playersCount % 2 !== 0){
+        const cube = new THREE.Mesh( geometry, material );
+        scene.add( cube );
+        cube.position.set(5.5 - 1.5 * apponentCardsCount, 4.5, 2)
+        //cube.value = value
+      }else{
+        const cube2 = new THREE.Mesh( geometry, material.clone() );
+        cube2.material.color = new THREE.Color(0,0,1)
+        scene.add( cube2 );
+        cube2.position.set(-5.5 + 1.5 * apponentCardsCount, 4.5, -2)
+        //cube2.value = value
+      }
+      apponentCardsCount++
 
-    const cube2 = new THREE.Mesh( geometry, material.clone() );
-    cube2.material.color = new THREE.Color(0,0,1)
-    scene.add( cube2 );
-    cube2.position.set(5.5, 4.5, -2)
+    }else{
+      if(playersCount % 2 == 0){
+        const cube = new THREE.Mesh( geometry, material );
+        scene.add( cube );
+        cube.position.set(-5.5 + 1.5 * yourCardsCount, 4.5, 2)
+        //cube.value = value
+      }else{
+        const cube2 = new THREE.Mesh( geometry, material.clone() );
+        cube2.material.color = new THREE.Color(0,0,1)
+        scene.add( cube2 );
+        cube2.position.set(5.5 - 1.5 *yourCardsCount, 4.5, -2)
+        //cube2.value = value
+      }
+      yourCardsCount++
+    }
+
+    
+    
   }
+  document.querySelector("button").innerText = playersCount
+  document.querySelector("button").addEventListener("click", () => {
+    socket.emit('hit', playersCount)
+    
+  })
+
+  socket.on('hit', data => {
+    addCube(data)
+  })
 
 
   const loader = new GLTFLoader();
@@ -66,7 +141,7 @@ const init = playersCount => {
     scene.add( light );
   })
 
-  addCube()
+  //addCube()
 
   const controls = new OrbitControls( camera, renderer.domElement );
           //controls.addEventListener( 'change', render ); // use if there is no animation loop
@@ -85,37 +160,5 @@ const init = playersCount => {
 
 
 
-var socket = io()
-var form = document.getElementById('form')
-var input = document.getElementById('input')
 
-form.addEventListener('submit', function (e) {
-  e.preventDefault()
-  if (input.value) {
-    socket.emit('message', input.value)
-    input.value = ''
-  }
-})
-socket.on('message', function (msg) {
-
-  document.querySelectorAll("li").forEach(el => el.style.bottom = +el.style.bottom.replace("px", "") + 15 + "px")
-
-  var item = document.createElement('li')
-  item.style.position = "absolute"
-  item.style.right = "40px"
-  item.style.bottom = "70px"
-  item.textContent = msg //test + ": " + msg
-  item.style.color = "green"
-  document.querySelector("messages").appendChild(item)
-  window.scrollTo(0, document.body.scrollHeight)
-
-  //addCube()
-})
-
-socket.on('new player', function(playersCount){
-  console.log("ff")
-  if(!INIT) init(playersCount)
-  INIT = true
-  
-})
 
