@@ -8,11 +8,18 @@ app.get("/", function (request, response) {
   response.sendFile(__dirname + '/index.html');
 });
 
+let playersCount = 0
+
 app.use('/static', express.static('static'));
 
 io.on('connection', (socket) => { 
   console.log('Client connected') 
+  playersCount++
+  console.log(playersCount)
+  io.emit("new player", playersCount)
+
   socket.on('disconnect', () => { 
+    playersCount--
     console.log('Client disconnected') 
   }) 
   socket.on('message', (msg) => { 
