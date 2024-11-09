@@ -24,7 +24,22 @@
     <ul id="messages"></ul>
     <button>HIT</button>
     <form id="form" action=""><input id="input" autocomplete="off" /><button>Send</button></form>
+
+     <!-- Defines the import map -->
+  <!--   <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.132.2/build/three.module.js",
+            "three-mesh-ui": "https://unpkg.com/three-mesh-ui@6.4.0/build/three-mesh-ui.module.js"
+        }
+    }
+    </script> -->
+
+    <script src="https://unpkg.com/three@0.150.0/build/three.js"></script>
+    <script src="https://unpkg.com/three-mesh-ui@6.4.1/build/three-mesh-ui.min.js"></script>
     <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+
     <script type="module" src="static/main.js"></script>
   </body>
 </html>

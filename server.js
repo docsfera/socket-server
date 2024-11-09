@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http); // вставьте это после определения http
 
 
-const stack = {
+let stack = {
   nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 }
@@ -27,6 +27,11 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => { 
     playersCount--
     console.log('Client disconnected') 
+    
+    stack = {
+      nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    }
+
   }) 
   socket.on('message', data => { 
     console.log(data.msg)
@@ -35,7 +40,12 @@ io.on('connection', (socket) => {
 
 
   socket.on("hit", (playersCount) => {
-    io.emit('hit', {playersCount, value: stack.nums[3]}) 
+    //Math.random() * (max - min) + min;
+    const randomIndex = Math.floor(Math.random() * stack.nums.length)
+    console.log({randomIndex})
+
+    io.emit('hit', {playersCount, value: stack.nums[randomIndex]}) 
+    stack.nums.splice(randomIndex, 1)
   })
 }) 
 

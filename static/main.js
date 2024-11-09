@@ -1,5 +1,11 @@
 import * as THREE from './three.module.js';
 
+//window.THREE = THREE
+// import * as ThreeMeshUI from "./three-mesh-ui.js";
+
+console.log(ThreeMeshUI)
+//import * as ThreeMeshUI from "three-mesh-ui";
+
 import {GLTFLoader} from "./GLTFLoader.js"
 import { OrbitControls } from './OrbitControls.js'
 
@@ -14,7 +20,7 @@ let INIT = false
 var socket = io()
 var form = document.getElementById('form')
 var input = document.getElementById('input')
-
+//
 form.addEventListener('submit', function (e) {
   e.preventDefault()
   if (input.value) {
@@ -52,6 +58,10 @@ const init = playersCount => {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
+  document.addEventListener("keydown", () => {
+    console.log(scene)
+  })
+
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize( window.innerWidth, window.innerHeight );
   renderer.setAnimationLoop( animate );
@@ -77,30 +87,54 @@ const init = playersCount => {
     if(data.playersCount !== playersCount){
 
       if(playersCount % 2 !== 0){
-        const cube = new THREE.Mesh( geometry, material );
-        scene.add( cube );
-        cube.position.set(5.5 - 1.5 * apponentCardsCount, 4.5, 2)
+
+        const cube = scene.getObjectByName("Card_" + data.value)
+        cube.visible = true
+
+        cube.rotation.x = Math.PI
+        cube.rotation.y = Math.PI / 2
+        cube.rotation.z = - Math.PI / 2
+        cube.position.set(5.5 - 3 * apponentCardsCount, 4.5, 2)
+
+        cube.material.color = new THREE.Color(0,1,1)
         //cube.value = value
       }else{
-        const cube2 = new THREE.Mesh( geometry, material.clone() );
+        console.log("1")
+        const cube2 = scene.getObjectByName("Card_" + data.value)
+        cube2.visible = true
+
         cube2.material.color = new THREE.Color(0,0,1)
-        scene.add( cube2 );
-        cube2.position.set(-5.5 + 1.5 * apponentCardsCount, 4.5, -2)
+        cube2.rotation.x = Math.PI
+        cube2.rotation.y = Math.PI / 2
+        cube2.rotation.z = - Math.PI / 2
+        cube2.position.set(-5.5 + 3 * apponentCardsCount, 4.5, -2)
         //cube2.value = value
       }
       apponentCardsCount++
 
     }else{
       if(playersCount % 2 == 0){
-        const cube = new THREE.Mesh( geometry, material );
-        scene.add( cube );
-        cube.position.set(-5.5 + 1.5 * yourCardsCount, 4.5, 2)
+        const cube = scene.getObjectByName("Card_" + data.value)
+        cube.visible = true
+        cube.rotation.x = Math.PI
+        cube.rotation.y = -Math.PI / 2
+        cube.rotation.z = - Math.PI / 2
+        cube.position.set(-5.5 + 3 * yourCardsCount, 4.5, 2)
+
+        cube.material.color = new THREE.Color(0,1,1)
         //cube.value = value
       }else{
-        const cube2 = new THREE.Mesh( geometry, material.clone() );
+        console.log("2")
+        const cube2 = scene.getObjectByName("Card_" + data.value).clone()
+        scene.add(cube2)
+        cube2.visible = true
+
         cube2.material.color = new THREE.Color(0,0,1)
-        scene.add( cube2 );
-        cube2.position.set(5.5 - 1.5 *yourCardsCount, 4.5, -2)
+
+        cube2.rotation.x = Math.PI
+        cube2.rotation.y = Math.PI / 2
+        cube2.rotation.z = - Math.PI / 2
+        cube2.position.set(5.5 - 3 *yourCardsCount, 4.5, -2)
         //cube2.value = value
       }
       yourCardsCount++
@@ -139,6 +173,41 @@ const init = playersCount => {
     const light = new THREE.AmbientLight( 0xffffff );
     light.intensity = 2
     scene.add( light );
+
+    loader.load('./static/3d/trump_nums.glb', function ( gltf ) {
+      console.log("cards is loaded")
+      scene.add(gltf.scene)
+    })
+
+
+    // TEXT
+
+    const container = new ThreeMeshUI.Block({
+        backgroundColor: new THREE.Color(1, 1, 1),
+        width: 2,
+        height: 2,
+        justifyContent: "center",
+        textAlign: "center",
+        fontFamily: './static/font/Roboto-msdf.json',
+        fontTexture: './static/font/Roboto-msdf.png',
+        borderRadius: 0, // Убираем радиус границ
+    })
+
+    const text = new ThreeMeshUI.Text({
+      content: "1275",
+      fontSize: 5,
+      fontColor: new THREE.Color(0, 0, 0)
+    })
+
+    text.name = "container_text"
+
+    container.add(text)
+    container.rotation.x = - Math.PI / 2
+    container.name = "container"
+    //container.position.z = -0.015 - ((wall.wallWidth / 0.016) - 1) * (0.016 / 2)
+    scene.add(container)
+
+    container.traverse( _ => _.visible = true)
   })
 
   //addCube()
@@ -151,6 +220,7 @@ const init = playersCount => {
           controls.update();
 
   function animate(){
+    ThreeMeshUI.update();
     renderer.render(scene, camera)
   }
 }

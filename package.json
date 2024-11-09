@@ -12,6 +12,7 @@
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "socket.io": "^4.7.5",
-    "three": "^0.166.1"
+    "three": "^0.166.1",
+    "three-mesh-ui": "^6.5.4"
   }
 }
