@@ -87,8 +87,10 @@ const init = playersCount => {
     if(data.playersCount !== playersCount){
 
       if(playersCount % 2 !== 0){
+        console.log("11")
 
-        const cube = scene.getObjectByName("Card_" + data.value)
+        const cube = scene.getObjectByName("Card_" + data.value).clone()
+        scene.add(cube)
         cube.visible = true
 
         cube.rotation.x = Math.PI
@@ -97,10 +99,13 @@ const init = playersCount => {
         cube.position.set(5.5 - 3 * apponentCardsCount, 4.5, 2)
 
         cube.material.color = new THREE.Color(0,1,1)
-        //cube.value = value
+        cube.value = data.value
+
+        cube.isYours = (playersCount == data.playersCount)
       }else{
         console.log("1")
-        const cube2 = scene.getObjectByName("Card_" + data.value)
+        const cube2 = scene.getObjectByName("Card_" + data.value).clone()
+        scene.add(cube2)
         cube2.visible = true
 
         cube2.material.color = new THREE.Color(0,0,1)
@@ -108,13 +113,17 @@ const init = playersCount => {
         cube2.rotation.y = Math.PI / 2
         cube2.rotation.z = - Math.PI / 2
         cube2.position.set(-5.5 + 3 * apponentCardsCount, 4.5, -2)
-        //cube2.value = value
+        cube2.value = data.value
+
+        cube2.isYours = (playersCount == data.playersCount)
       }
       apponentCardsCount++
 
     }else{
       if(playersCount % 2 == 0){
-        const cube = scene.getObjectByName("Card_" + data.value)
+        console.log("22")
+        const cube = scene.getObjectByName("Card_" + data.value).clone()
+        scene.add(cube)
         cube.visible = true
         cube.rotation.x = Math.PI
         cube.rotation.y = -Math.PI / 2
@@ -122,7 +131,8 @@ const init = playersCount => {
         cube.position.set(-5.5 + 3 * yourCardsCount, 4.5, 2)
 
         cube.material.color = new THREE.Color(0,1,1)
-        //cube.value = value
+        cube.value = data.value
+        cube.isYours = (playersCount == data.playersCount)
       }else{
         console.log("2")
         const cube2 = scene.getObjectByName("Card_" + data.value).clone()
@@ -135,7 +145,8 @@ const init = playersCount => {
         cube2.rotation.y = Math.PI / 2
         cube2.rotation.z = - Math.PI / 2
         cube2.position.set(5.5 - 3 *yourCardsCount, 4.5, -2)
-        //cube2.value = value
+        cube2.value = data.value
+        cube2.isYours = (playersCount == data.playersCount)
       }
       yourCardsCount++
     }
@@ -149,8 +160,23 @@ const init = playersCount => {
     
   })
 
+
+  const countTotal = () => {
+    let total = 0
+    scene.traverse(child => {
+      if(child.name.includes("Card") && child.value && child.isYours == false){
+        console.log(child)
+        total += child.value
+      }
+    })
+    return total
+  }
+
   socket.on('hit', data => {
     addCube(data)
+    scene.getObjectByName("total_text").set({
+      content: String(countTotal())
+    })
   })
 
 
@@ -194,17 +220,24 @@ const init = playersCount => {
     })
 
     const text = new ThreeMeshUI.Text({
-      content: "1275",
-      fontSize: 5,
+      content: "0",
+      fontSize: 1,
       fontColor: new THREE.Color(0, 0, 0)
     })
 
-    text.name = "container_text"
+    text.name = "total_text"
 
     container.add(text)
     container.rotation.x = - Math.PI / 2
-    container.name = "container"
-    //container.position.z = -0.015 - ((wall.wallWidth / 0.016) - 1) * (0.016 / 2)
+    container.name = "container_total_text"
+
+     if(playersCount % 2 == 0){
+      container.position.set(5.5, 4.5, -2)
+    }else{
+      container.position.set(-5.5, 4.5, 2)
+      container.rotation.z = Math.PI
+    }
+    
     scene.add(container)
 
     container.traverse( _ => _.visible = true)
