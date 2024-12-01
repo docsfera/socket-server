@@ -48,6 +48,10 @@ socket.on('new player', function(playersCount){
   console.log("ff")
   if(!INIT) init(playersCount)
   INIT = true
+
+  if(playersCount > 1){
+    document.querySelector("#waiter").style.display = "none"
+  }
   
 })
 
@@ -241,7 +245,17 @@ const init = playersCount => {
     scene.add(container)
 
     container.traverse( _ => _.visible = true)
+
+    // TODO: bit later
+    // setTimeout(() => {
+    //   socket.emit('hit', playersCount)
+    //   socket.emit('hit', playersCount)
+    // }, 1000)
+
+
   })
+
+
 
   //addCube()
 
