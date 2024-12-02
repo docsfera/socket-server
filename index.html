@@ -11,7 +11,7 @@
         bottom: 50px;
         right: 40px;
       }
-      button{
+      .hit{
         position: absolute;
         bottom: 50px;
         left: 50%;
@@ -29,23 +29,64 @@
         justify-content: center;
         align-items: center;
       }
+      #accepter{
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.98);
+        display: none;
+        justify-content: center;
+        align-items: center;
+      }
       .container{
         width: 500px;
         height: 300px;
         border-radius: 5px;
         background: #676B6E;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
       }
-      .container .title{
+      .title{
         font-size: 29px;
-        margin-top: 130px; /*vashe poxuy*/
+      }
+
+      .accepts{
+        width: 120px;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        margin-top: 50px;
+      }
+      .accept__item{
+        width: 50px;
+        height: 50px;
+        background: black;
+        border-radius: 2px;
+      }
+      .ready{
+        outline: none;
+        border: 1px solid green;
+        width: 80px;
+        height: 40px;
+        cursor: pointer;
+      }
+      .ready:hover{
+        scale: 1.1;
+      }
+      .ready.active{
+        color: green;
       }
     </style>
   </head>
   <body>
     <ul id="messages"></ul>
-    <button>HIT</button>
-    <form id="form" action=""><input id="input" autocomplete="off" /><button>Send</button></form>
+    <button class="hit">HIT</button>
+    <form id="form" action=""><input id="input" autocomplete="off" /><button class="send">Send</button></form>
 
     <div id="waiter">
       <div class="container">
@@ -54,7 +95,14 @@
     </div>
     <div id="accepter">
       <div class="container">
-        <p class="title">accepter</p>
+    
+        <div class="accepts">
+          <div class="accept__item accept-one"></div>
+          <div class="accept__item accept-two"></div>
+        </div>
+
+        <button class="ready">Ready</button>
+
       </div>
     </div>
 

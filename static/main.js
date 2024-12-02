@@ -51,6 +51,7 @@ socket.on('new player', function(playersCount){
 
   if(playersCount > 1){
     document.querySelector("#waiter").style.display = "none"
+    document.querySelector("#accepter").style.display = "flex"
   }
   
 })
@@ -159,9 +160,12 @@ const init = playersCount => {
     
   }
   document.querySelector("button").innerText = playersCount
-  document.querySelector("button").addEventListener("click", () => {
+  document.querySelector(".hit").addEventListener("click", () => {
     socket.emit('hit', playersCount)
     
+  })
+  document.querySelector(".ready").addEventListener("click", () => {
+    //document.querySelector("#accepter").style.display = "none"
   })
 
 
