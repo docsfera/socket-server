@@ -5,8 +5,8 @@ var io = require('socket.io')(http); // вставьте это после оп�
 
 
 let stack = {
-  nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-
+  nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  playersReady: []
 }
 
 // Serve the index page 
@@ -24,17 +24,21 @@ io.on('connection', (socket) => {
   console.log(playersCount)
   io.emit("new player", playersCount)
 
+  stack.playersReady = []
+
   socket.on('disconnect', () => { 
     playersCount--
     console.log('Client disconnected') 
     
     stack = {
-      nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+      nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      playersReady: []
     }
 
   }) 
   socket.on('message', data => { 
     console.log(data.msg)
+
     io.emit('message', data) 
   }) 
 
@@ -46,6 +50,11 @@ io.on('connection', (socket) => {
 
     io.emit('hit', {playersCount, value: stack.nums[randomIndex]}) 
     stack.nums.splice(randomIndex, 1)
+  })
+  socket.on("ready", (playersCount) => {
+    console.log(stack)
+    stack.playersReady.push(playersCount)
+    io.emit('ready', {playersCount, playersReady: stack.playersReady})
   })
 }) 
 

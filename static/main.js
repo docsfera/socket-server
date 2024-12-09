@@ -107,6 +107,11 @@ const init = playersCount => {
         cube.value = data.value
 
         cube.isYours = (playersCount == data.playersCount)
+
+        if(apponentCardsCount == 0){
+          cube.material = new THREE.MeshBasicMaterial({color: "#3A3C3E"})
+          cube.isFirst = true
+        }
       }else{
         console.log("1")
         const cube2 = scene.getObjectByName("Card_" + data.value).clone()
@@ -121,6 +126,11 @@ const init = playersCount => {
         cube2.value = data.value
 
         cube2.isYours = (playersCount == data.playersCount)
+
+        if(apponentCardsCount == 0){
+          cube2.material = new THREE.MeshBasicMaterial({color: "#3A3C3E"})
+          cube2.isFirst = true
+        }
       }
       apponentCardsCount++
 
@@ -138,6 +148,9 @@ const init = playersCount => {
         cube.material.color = new THREE.Color(0,1,1)
         cube.value = data.value
         cube.isYours = (playersCount == data.playersCount)
+        // if(yourCardsCount == 0){
+        //   cube.material = new THREE.MeshBasicMaterial({color: "#3A3C3E"})
+        // }
       }else{
         console.log("2")
         const cube2 = scene.getObjectByName("Card_" + data.value).clone()
@@ -152,6 +165,10 @@ const init = playersCount => {
         cube2.position.set(5.5 - 3 *yourCardsCount, 4.5, -2)
         cube2.value = data.value
         cube2.isYours = (playersCount == data.playersCount)
+
+        // if(yourCardsCount == 0){
+        //   cube2.material = new THREE.MeshBasicMaterial({color: "#3A3C3E"})
+        // }
       }
       yourCardsCount++
     }
@@ -162,17 +179,27 @@ const init = playersCount => {
   document.querySelector("button").innerText = playersCount
   document.querySelector(".hit").addEventListener("click", () => {
     socket.emit('hit', playersCount)
-    
   })
   document.querySelector(".ready").addEventListener("click", () => {
-    //document.querySelector("#accepter").style.display = "none"
+    socket.emit('ready', playersCount)
+  })
+
+  socket.on('ready', data => {
+    console.log(data)
+    document.querySelector(".accept-" + data.playersCount).style.background = "green"
+    if(data.playersReady.length > 1){
+
+      document.querySelector("#accepter").style.display = "none"
+      socket.emit('hit', playersCount)
+      socket.emit('hit', playersCount)
+    }
   })
 
 
   const countTotal = () => {
     let total = 0
     scene.traverse(child => {
-      if(child.name.includes("Card") && child.value && child.isYours == false){
+      if(child.name.includes("Card") && child.value && child.isYours == false && !child.isFirst){
         console.log(child)
         total += child.value
       }
@@ -183,7 +210,7 @@ const init = playersCount => {
   socket.on('hit', data => {
     addCube(data)
     scene.getObjectByName("total_text").set({
-      content: String(countTotal())
+      content: String(countTotal()) + "/21"
     })
   })
 
@@ -213,7 +240,6 @@ const init = playersCount => {
       scene.add(gltf.scene)
     })
 
-
     // TEXT
 
     const container = new ThreeMeshUI.Block({
@@ -229,7 +255,7 @@ const init = playersCount => {
 
     const text = new ThreeMeshUI.Text({
       content: "0",
-      fontSize: 1,
+      fontSize: 0.6,
       fontColor: new THREE.Color(0, 0, 0)
     })
 
