@@ -6,7 +6,8 @@ var io = require('socket.io')(http); // вставьте это после оп�
 
 let stack = {
   nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-  playersReady: []
+  playersReady: [],
+  order: 1
 }
 
 // Serve the index page 
@@ -32,7 +33,8 @@ io.on('connection', (socket) => {
     
     stack = {
       nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      playersReady: []
+      playersReady: [],
+      order: 1
     }
 
   }) 
@@ -44,11 +46,20 @@ io.on('connection', (socket) => {
 
 
   socket.on("hit", (playersCount) => {
+    if(playersCount != stack.order && stack.nums.length < 11 - 3) return;
+
+    if(stack.order == 1){
+      stack.order = 2
+    }else{
+      stack.order = 1
+    }
+    console.log(stack.order)
+
     //Math.random() * (max - min) + min;
     const randomIndex = Math.floor(Math.random() * stack.nums.length)
-    console.log({randomIndex})
+    //console.log({randomIndex})
 
-    io.emit('hit', {playersCount, value: stack.nums[randomIndex]}) 
+    io.emit('hit', {playersCount, value: stack.nums[randomIndex], order: stack.order}) 
     stack.nums.splice(randomIndex, 1)
   })
   socket.on("ready", (playersCount) => {

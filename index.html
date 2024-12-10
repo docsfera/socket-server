@@ -11,10 +11,20 @@
         bottom: 50px;
         right: 40px;
       }
+      button{
+        cursor: pointer;
+      }
       .hit{
         position: absolute;
         bottom: 50px;
-        left: 50%;
+        left: 45%;
+        width: 100px;
+        height: 30px;
+      }
+      .skip{
+        position: absolute;
+        bottom: 50px;
+        left: 55%;
         width: 100px;
         height: 30px;
       }
@@ -86,6 +96,7 @@
   <body>
     <ul id="messages"></ul>
     <button class="hit">HIT</button>
+    <button class="skip">SKIP</button>
     <form id="form" action=""><input id="input" autocomplete="off" /><button class="send">Send</button></form>
 
     <div id="waiter">
