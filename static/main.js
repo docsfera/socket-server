@@ -77,6 +77,8 @@ const init = playersCount => {
   const geometry = new THREE.BoxGeometry( 0.8, 0.1, 1 );
   const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
+  let hidedMaterial
+
 
   if(playersCount % 2 == 0){
     camera.position.z = 5
@@ -113,6 +115,7 @@ const init = playersCount => {
         cube.isYours = (playersCount == data.playersCount)
 
         if(apponentCardsCount == 0){
+          hidedMaterial = cube.material.clone()
           cube.material = new THREE.MeshBasicMaterial({color: "#3A3C3E"})
           cube.isFirst = true
         }
@@ -132,6 +135,7 @@ const init = playersCount => {
         cube2.isYours = (playersCount == data.playersCount)
 
         if(apponentCardsCount == 0){
+          hidedMaterial = cube2.material.clone()
           cube2.material = new THREE.MeshBasicMaterial({color: "#3A3C3E"})
           cube2.isFirst = true
         }
@@ -173,6 +177,9 @@ const init = playersCount => {
   document.querySelector(".hit").addEventListener("click", () => {
     socket.emit('hit', playersCount)
   })
+  document.querySelector(".skip").addEventListener("click", () => {
+    socket.emit('skip', playersCount)
+  })
   document.querySelector(".ready").addEventListener("click", () => {
     socket.emit('ready', playersCount)
   })
@@ -193,7 +200,7 @@ const init = playersCount => {
     let total = 0
     scene.traverse(child => {
       if(child.name.includes("Card") && child.value && child.isYours == false && !child.isFirst){
-        console.log(child)
+        console.log(child.value)
         total += child.value
       }
     })
@@ -211,6 +218,33 @@ const init = playersCount => {
     addCube(data)
     scene.getObjectByName("total_text").set({
       content: String(countTotal()) + "/21"
+    })
+  })
+
+  socket.on("skip", order => {
+    if(playersCount == order){
+      document.querySelector(".hit").style.background = "green"
+    }else{
+      document.querySelector(".hit").style.background = "red"
+    }
+  })
+
+  socket.on("end" , () => {
+    console.log("ENDDDD")
+
+    scene.traverse(child => {
+      if(child.isFirst){
+        child.material = hidedMaterial
+        child.isFirst = false
+        scene.getObjectByName("total_text").set({
+          content: String(countTotal()) + "/21"
+        })
+        setTimeout(() => {
+          document.querySelector("#accepter").style.display = "flex"
+          document.querySelector(".accept-1").style.background = "red"
+          document.querySelector(".accept-2").style.background = "red"
+        }, 2000)
+      }
     })
   })
 
