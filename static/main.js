@@ -198,7 +198,7 @@ const init = playersCount => {
 
   const countTotal = () => {
     let total = 0
-    scene.traverse(child => {
+    scene.children.map(child => {
       if(child.name.includes("Card") && child.value && child.isYours == false && !child.isFirst){
         console.log(child.value)
         total += child.value
@@ -229,10 +229,10 @@ const init = playersCount => {
     }
   })
 
-  socket.on("end" , () => {
+  socket.on("end" , (data) => {
     console.log("ENDDDD")
 
-    scene.traverse(child => {
+    scene.children.map(child => {
       if(child.isFirst){
         child.material = hidedMaterial
         child.isFirst = false
@@ -243,7 +243,20 @@ const init = playersCount => {
           document.querySelector("#accepter").style.display = "flex"
           document.querySelector(".accept-1").style.background = "red"
           document.querySelector(".accept-2").style.background = "red"
-        }, 2000)
+
+
+          document.querySelector("#score").innerText = data.wins1 + "/" + data.wins2
+
+          scene.children.map(ch => {
+            if(ch.name.includes("Card")) {
+              setTimeout(() => ch.removeFromParent(), 0)
+              yourCardsCount = 0
+              apponentCardsCount = 0
+
+            }
+          })
+
+        }, 4000)
       }
     })
   })

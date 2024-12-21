@@ -8,7 +8,12 @@ let stack = {
   nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   playersReady: [],
   order: 1,
-  skips: 0
+  skips: 0,
+  wins1: 0,
+  wins2: 0,
+  score1: 0,
+  score2: 0,
+
 }
 
 // Serve the index page 
@@ -36,8 +41,14 @@ io.on('connection', (socket) => {
       nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
       playersReady: [],
       order: 1,
-      skips: 0
+      skips: 0,
+      wins1: 0,
+      wins2: 0,
+      score1: 0,
+      score2: 0,
     }
+
+    console.log("!!!!!!!")
 
   }) 
   socket.on('message', data => { 
@@ -59,9 +70,12 @@ io.on('connection', (socket) => {
 
     //Math.random() * (max - min) + min;
     const randomIndex = Math.floor(Math.random() * stack.nums.length)
+    const value = stack.nums[randomIndex]
+
+    stack['score' + playersCount] += value
     //console.log({randomIndex})
 
-    io.emit('hit', {playersCount, value: stack.nums[randomIndex], order: stack.order}) 
+    io.emit('hit', {playersCount, value: value, order: stack.order}) 
     stack.nums.splice(randomIndex, 1)
     stack.skips = 0
   })
@@ -76,13 +90,39 @@ io.on('connection', (socket) => {
       }
       io.emit("skip", stack.order)
     }else{
-      io.emit("end")
+      
+
+      // if(stack.score1 > stack.score2){
+      //   stack.wins1++
+      // }else if(stack.score1 == stack.score2){
+
+      // }else{
+      //   stack.wins2++
+      // }
+
+      let w1 = 21 - stack.score1
+      let w2 = 21 - stack.score2
+
+      if(w1 < 0) stack.wins2++
+      if(w2 < 0) stack.wins1++
+
+      if(w1 > 0 && w2 > 0 && w1 < w2) stack.wins1++
+      if(w1 > 0 && w2 > 0 && w2 < w1) stack.wins2++
+
+      io.emit("end", {wins1: stack.wins1, wins2: stack.wins2})
+
+
       stack = {
         nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         playersReady: [],
         order: 1,
-        skips: 0
+        skips: 0,
+        score1: 0,
+        score2: 0,
+        wins1: stack.wins1,
+        wins2: stack.wins2,
       }
+      console.log(stack)
     }
     
   })
