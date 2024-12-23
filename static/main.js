@@ -37,7 +37,9 @@ socket.on('message', function (data) {
   item.style.right = "40px"
   item.style.bottom = "70px"
   item.textContent = data.msg //test + ": " + msg
-  item.style.color = (data.player == 1) ? "blue" : "green"
+  item.style.color = (data.player == 1) ? "blue" : "grown"
+  if(data.player == -1) item.style.color = "red"
+  if(data.player == 0) item.style.color = "green"
   messages.appendChild(item)
   window.scrollTo(0, document.body.scrollHeight)
 

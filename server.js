@@ -26,6 +26,7 @@ let playersCount = 0
 app.use('/static', express.static('static'));
 
 io.on('connection', (socket) => { 
+  io.emit('message', {msg: "Connected", player: 0})
   console.log('Client connected') 
   playersCount++
   console.log(playersCount)
@@ -36,6 +37,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => { 
     playersCount--
     console.log('Client disconnected') 
+
+    io.emit('message', {msg: "Disconnected", player: -1})
     
     stack = {
       nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -48,12 +51,8 @@ io.on('connection', (socket) => {
       score2: 0,
     }
 
-    console.log("!!!!!!!")
-
   }) 
   socket.on('message', data => { 
-    console.log(data.msg)
-
     io.emit('message', data) 
   }) 
 
@@ -66,14 +65,11 @@ io.on('connection', (socket) => {
     }else{
       stack.order = 1
     }
-    console.log(stack.order)
 
-    //Math.random() * (max - min) + min;
     const randomIndex = Math.floor(Math.random() * stack.nums.length)
     const value = stack.nums[randomIndex]
 
     stack['score' + playersCount] += value
-    //console.log({randomIndex})
 
     io.emit('hit', {playersCount, value: value, order: stack.order}) 
     stack.nums.splice(randomIndex, 1)
@@ -90,15 +86,6 @@ io.on('connection', (socket) => {
       }
       io.emit("skip", stack.order)
     }else{
-      
-
-      // if(stack.score1 > stack.score2){
-      //   stack.wins1++
-      // }else if(stack.score1 == stack.score2){
-
-      // }else{
-      //   stack.wins2++
-      // }
 
       let w1 = 21 - stack.score1
       let w2 = 21 - stack.score2
@@ -111,7 +98,6 @@ io.on('connection', (socket) => {
 
       io.emit("end", {wins1: stack.wins1, wins2: stack.wins2})
 
-
       stack = {
         nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         playersReady: [],
@@ -122,12 +108,10 @@ io.on('connection', (socket) => {
         wins1: stack.wins1,
         wins2: stack.wins2,
       }
-      console.log(stack)
     }
     
   })
   socket.on("ready", (playersCount) => {
-    console.log(stack)
     stack.playersReady.push(playersCount)
     io.emit('ready', {playersCount, playersReady: stack.playersReady})
   })
